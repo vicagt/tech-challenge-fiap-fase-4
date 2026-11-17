@@ -1,1 +1,59 @@
+# Análise de correlação entre avaliações e variáveis comerciais — Amazon
+
+## Objetivo
+Investigar a associação linear entre `rating` e quatro variáveis comerciais dos produtos da Amazon — `actual_price`, `discounted_price`, `discount_percentage` e `rating_count` — comparando a base completa de produtos únicos com os três primeiros níveis de categorias.
+
+## Arquivos
+- **`correlacao_tech04_atualizado.ipynb`**: notebook de preparação, exploração, correlação e visualização.
+- **`amazon.csv`**: base de entrada esperada no mesmo diretório do notebook.
+
+## Dados e unidade de análise
+O CSV original contém **1,465 registros**. Após deduplicação por `product_id`, permanecem **1,351 produtos únicos**; **114 registros excedentes** são retirados. Para cada produto, o notebook conserva a linha com o **maior `rating_count` numérico**; em empate, mantém a primeira ocorrência do arquivo original. A conversão de `rating_count` é realizada **antes da ordenação**, evitando comparação lexicográfica de números armazenados como texto.
+
+Os preços são expressos em **rúpias indianas (₹)**. As principais colunas são `product_id`, `category`, `rating`, `rating_count`, `actual_price`, `discounted_price` e `discount_percentage`.
+
+## Tecnologias
+Python, pandas, NumPy, matplotlib, seaborn e SciPy (importada; testes inferenciais não implementados).
+
+## Etapas metodológicas
+1. **Importação e deduplicação:** leitura de `amazon.csv` e seleção de um registro por `product_id` com base no maior `rating_count`.
+2. **Preparação:** extração de `first_category_level`, `second_category_level` e `third_category_level`; remoção de símbolos monetários, separadores de milhares e `%`; conversão numérica com `errors='coerce'`.
+3. **Exploração:** dimensões, valores ausentes, estatísticas descritivas, histograma de `rating` e boxplots das variáveis quantitativas.
+4. **Correlação geral:** matriz de Pearson para as cinco variáveis quantitativas.
+5. **Correlação segmentada:** matrizes por categoria nos níveis 1, 2 e 3, exibidas para grupos com **50 ou mais registros**.
+6. **Comparação entre variáveis:** tabela com correlação de `rating` versus as quatro variáveis, exigindo **pelo menos 50 pares válidos**; seleção da maior correlação em valor absoluto por categoria e gráfico das 15 maiores associações selecionadas.
+
+## Resultados principais
+Na base deduplicada, a correlação entre `rating` e `discounted_price` é **r = 0.126**, positiva e muito fraca. A análise segmentada identificou associações mais intensas em alguns grupos:
+
+| Nível | Categoria | Variável mais associada ao rating | Produtos válidos | Pearson (r) |
+|---|---|---|---:|---:|
+| 3 | `Smartphones&BasicMobiles` | `discounted_price` | 77 | +0.529 |
+| 3 | `Televisions` | `discounted_price` | 66 | +0.436 |
+| 3 | `SmartWatches` | `actual_price` | 62 | +0.417 |
+| 2 | `WearableTechnology` | `actual_price` | 62 | +0.417 |
+| 3 | `Headphones` | `rating_count` | 60 | +0.413 |
+| 2 | `Headphones,Earbuds&Accessories` | `rating_count` | 63 | +0.387 |
+| 2 | `HomeTheater,TV&Video` | `discounted_price` | 156 | +0.371 |
+| 3 | `Cables&Accessories` | `discounted_price` | 167 | +0.369 |
+
+O ranking considera **a magnitude absoluta** da correlação: valores negativos podem representar associações mais fortes do que valores positivos menores. As associações observadas **não indicam causalidade**.
+
+## Decisões e limitações
+- A deduplicação atribui **um único registro a cada produto**, priorizando a maior contagem de avaliações. Isso não comprova que o registro selecionado seja o mais recente; o CSV não fornece uma série temporal confiável para esse propósito.
+- Em caso de empate em `rating_count`, mantém-se a primeira ocorrência na ordem original.
+- Os agrupamentos dos níveis 2 e 3 usam **apenas o nome daquele nível**, não a trajetória hierárquica completa; categorias homônimas podem ser agrupadas.
+- O filtro de 50 registros/pares é **exploratório**, não uma garantia de significância estatística.
+- Não foram realizados testes de hipóteses, intervalos de confiança, correlações de Spearman nem análises de sensibilidade a outliers.
+- A seleção do maior coeficiente entre várias categorias pode destacar associações instáveis.
+- A quantidade de pares válidos pode variar entre variáveis devido a valores ausentes.
+
+## Como executar
+1. Instale as dependências: `pip install pandas numpy matplotlib seaborn scipy jupyter`.
+2. Coloque `amazon.csv` no mesmo diretório do notebook.
+3. Abra `correlacao_tech04_atualizado.ipynb` no Jupyter Notebook ou JupyterLab.
+4. Execute as células **na ordem**, do início ao fim.
+
+## Conclusão
+A correlação entre avaliação e preço com desconto é muito fraca na base agregada de produtos únicos, mas aumenta em determinadas subcategorias. A comparação com preço original, percentual de desconto e quantidade de avaliações evidencia que a variável mais associada ao `rating` depende do segmento. Os resultados apoiam uma leitura segmentada e exploratória, sem permitir conclusões causais.
 
